@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Admin - TatuApp</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header>
+  <h1>🖋️ TatuApp - Administrador</h1>
+  <div class="user" id="user-display"></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/views/profile.html" class="btn secondary" style="width:auto">Mi Perfil</a>
+    <a href="/views/calendar.html" class="btn secondary" style="width:auto">Calendario</a>
+    <a href="/views/availability.html" class="btn secondary" style="width:auto">Disponibilidad</a>
+    <button class="btn outline" onclick="logout()">Cerrar sesión</button>
+  </div>
+</header>
+<main>
+  <aside><h3>Gestión</h3><p>Administra usuarios, roles y toda la plataforma.</p></aside>
+  <div id="app-view">
+    <div class="card">
+      <h3>Usuarios</h3>
+      <table><thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Cambiar rol</th><th></th></tr></thead><tbody id="admin-users"></tbody></table>
+    </div>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+</body>
+</html>

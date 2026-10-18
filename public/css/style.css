@@ -1,0 +1,54 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; background: #0f0f14; color: #eee; height: 100vh; display: flex; flex-direction: column; }
+header { background: #1e1e24; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+header h1 { font-size: 18px; letter-spacing: 1px; }
+header .user { font-size: 13px; opacity: .8; }
+main { flex: 1; overflow: auto; padding: 20px; display: grid; grid-template-columns: 260px 1fr; gap: 20px; height: calc(100vh - 60px); }
+aside { background: #1e1e24; padding: 16px; border-radius: 12px; height: fit-content; position: sticky; top: 20px; }
+aside h3 { margin-bottom: 12px; font-size: 15px; color: #ffb300; }
+.btn { width: 100%; padding: 8px; margin: 6px 0; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; background: #ffb300; color: #000; }
+.btn.outline { background: transparent; color: #ffb300; border: 1px solid #ffb300; }
+.btn.secondary { background: #333; color: #eee; border: 1px solid #555; }
+.btn.danger { background: #d33; color: #fff; }
+input, select { width: 100%; padding: 8px; margin: 6px 0; border-radius: 6px; border: 1px solid #444; background: #16161c; color: #eee; }
+.card { background: #1e1e24; padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+.card h3 { margin-bottom: 10px; font-size: 15px; color: #fff; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid #333; }
+tr:hover { background: #252530; }
+.slot { display: inline-block; padding: 4px 8px; margin: 4px; background: #2a2a33; border-radius: 4px; cursor: pointer; border: 1px solid #444; }
+.slot.selected { background: #ffb300; color: #000; font-weight: 700; }
+.slot.disabled { opacity: .4; cursor: not-allowed; }
+.chat-box { height: 300px; overflow-y: auto; background: #16161c; border-radius: 8px; padding: 10px; margin-bottom: 10px; border: 1px solid #333; }
+.msg { margin-bottom: 8px; padding: 8px 12px; border-radius: 10px; max-width: 80%; font-size: 13px; }
+.msg.me { background: #ffb300; color: #000; margin-left: auto; border-bottom-right-radius: 2px; }
+.msg.them { background: #2a2a33; color: #eee; border-bottom-left-radius: 2px; }
+.msg-row { display: flex; margin-bottom: 6px; }
+.msg-row input { flex: 1; }
+.hidden { display: none !important; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.text-center { text-align: center; }
+label { font-size: 12px; display: block; margin-top: 8px; color: #bbb; }
+.profile-card { max-width: 500px; margin: 0 auto; }
+.profile-actions { display: flex; gap: 8px; margin-top: 16px; }
+.password-toggle { font-size: 11px; color: #ffb300; cursor: pointer; margin-top: -6px; display: block; }
+
+.fc { font-family: system-ui, sans-serif; }
+.fc-toolbar-chunk { display: flex; gap: 8px; align-items: center; }
+.fc-button { background: #2a2a33 !important; color: #eee !important; border: 1px solid #444 !important; border-radius: 6px !important; padding: 6px 12px !important; font-size: 13px !important; }
+.fc-button-active { background: #ffb300 !important; color: #000 !important; }
+.fc-daygrid-day { background: #16161c; }
+.fc-day-today { background: #252530 !important; }
+.fc-event { border-radius: 6px; font-size: 12px; cursor: pointer; opacity: 0.9; }
+.fc-event:hover { opacity: 1; }
+
+.av-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); gap: 3px; background: #2a2a33; border-radius: 8px; overflow: hidden; border: 1px solid #444; max-height: 75vh; overflow-y: auto; }
+.av-hour-label { padding: 8px 4px; font-size: 11px; text-align: center; background: #1e1e24; color: #888; border-right: 1px solid #333; }
+.av-day-header { padding: 8px 4px; font-size: 12px; font-weight: 700; text-align: center; background: #1e1e24; color: #ffb300; border-bottom: 1px solid #333; }
+.av-cell { height: 48px; border: 1px solid #222; font-size: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.1s; }
+.av-cell:hover { filter: brightness(1.15); }
+.av-closed { background: #16161c; color: #444; cursor: default; }
+.av-available { background: #1b4532; color: #0f0; }
+.av-booked { background: #4a1a1a; color: #ff6b6b; }
+.av-booked.confirmed { background: #6b0a0a; }
+.av-booked.pending { background: #6b4a0a; color: #ffb300; }

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Login - TatuApp</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header><h1>🖋️ TatuApp</h1></header>
+<main style="grid-template-columns:1fr; height:auto; padding:60px 20px;">
+  <div class="card" style="max-width:400px;margin:0 auto;">
+    <h2 style="margin-bottom:16px;text-align:center">Iniciar sesión</h2>
+    <label>Usuario</label><input id="login-user" placeholder="usuario">
+    <label>Contraseña</label><input id="login-pass" type="password">
+    <button class="btn" onclick="login()">Entrar</button>
+    <p style="text-align:center;margin-top:12px;font-size:12px">¿No tienes cuenta? <a href="/views/register.html" style="color:#ffb300">Regístrate</a></p>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+</body>
+</html>

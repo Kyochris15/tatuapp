@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Disponibilidad - TatuApp</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header>
+  <h1>🖋️ TatuApp - Disponibilidad</h1>
+  <div class="user" id="user-display"></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/views/profile.html" class="btn secondary" style="width:auto">Mi Perfil</a>
+    <a href="/views/calendar.html" class="btn secondary" style="width:auto">Calendario</a>
+    <button class="btn outline" onclick="logout()">Cerrar sesión</button>
+  </div>
+</header>
+<main style="padding:20px;">
+  <div style="margin-bottom:16px; display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
+    <label>Tatuador</label>
+    <select id="av-tattooist"></select>
+    <label>Desde</label>
+    <input type="date" id="av-start">
+    <label>Hasta</label>
+    <input type="date" id="av-end">
+    <button class="btn" onclick="loadAvailability()">Ver disponibilidad</button>
+  </div>
+  <div id="av-title" style="font-size:16px;color:#fff;margin-bottom:10px;"></div>
+  <div id="av-grid"></div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const u = await (await fetch('/api/me')).json();
+  if (!u) { location.href = '/views/login.html'; return; }
+  document.getElementById('user-display').textContent = u.username + ' (' + u.role + ')';
+  const tattooists = await (await fetch('/api/tattooists')).json();
+  window.__tattooists = tattooists;
+  const sel = document.getElementById('av-tattooist');
+  sel.innerHTML = '<option value="">Selecciona tatuador</option>' +
+    tattooists.map(t => `<option value="${t.id}">${t.username}</option>`).join('');
+  if (u.role === 'tattooist') sel.value = u.id;
+  initWeekSelector();
+  loadAvailability();
+  document.getElementById('av-tattooist').onchange = loadAvailability;
+  document.getElementById('av-start').onchange = loadAvailability;
+  document.getElementById('av-end').onchange = loadAvailability;
+});
+</script>
+</body>
+</html>

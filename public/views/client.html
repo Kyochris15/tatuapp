@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Cliente - TatuApp</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header>
+  <h1>🖋️ TatuApp - Cliente</h1>
+  <div class="user" id="user-display"></div>
+  <div style="display:flex;gap:8px;">
+    <a href="/views/profile.html" class="btn secondary" style="width:auto">Mi Perfil</a>
+    <a href="/views/calendar.html" class="btn secondary" style="width:auto">Calendario</a>
+    <a href="/views/availability.html" class="btn secondary" style="width:auto">Disponibilidad</a>
+    <button class="btn outline" onclick="logout()">Cerrar sesión</button>
+  </div>
+</header>
+<main>
+  <aside>
+    <h3>Reservar cita</h3>
+    <label>Tatuador</label><select id="client-tattooist" onchange="loadSlots()"></select>
+    <label>Fecha</label><input type="date" id="client-date" onchange="loadSlots()">
+    <div id="slots-container"></div>
+    <input type="hidden" id="selected-slot">
+    <button class="btn" id="btn-reserve" onclick="reserve()">Reservar hora</button>
+  </aside>
+  <div id="app-view">
+    <div class="card" id="reserve-section" style="display:none;">
+      <h3>1. Diseña tu tatuaje</h3>
+      <p>Usa el probador 3D para elegir imagen, colocarla en el cuerpo y definir el tamaño.</p>
+      <button class="btn" onclick="location.href='/views/probador.html'">Abrir Probador 3D</button>
+      <p style="font-size:12px;color:#bbb;margin-top:8px;">Cuando termines en el probador, el diseño quedará guardado para esta reserva.</p>
+    </div>
+    <div class="card">
+      <h3>2. Elige fecha y hora</h3>
+      <p>Selecciona un tatuador, una fecha y una hora disponible.</p>
+    </div>
+    <div class="card">
+      <h3>Mis citas</h3>
+      <table><thead><tr><th>Fecha</th><th>Hora</th><th>Tatuador</th><th>Estado</th><th>Precio</th></tr></thead><tbody id="my-appts"></tbody></table>
+    </div>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const url = new URLSearchParams(location.search);
+  const tid = url.get('tid');
+  const date = url.get('date');
+  const time = url.get('time');
+  if (tid) {
+    document.getElementById('client-tattooist').value = tid;
+    loadSlots();
+  }
+  if (date) {
+    document.getElementById('client-date').value = date;
+    setTimeout(() => { if (time) document.getElementById('selected-slot').value = time; }, 150);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Registro - TatuApp</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header><h1>🖋️ TatuApp</h1></header>
+<main style="grid-template-columns:1fr; height:auto; padding:60px 20px;">
+  <div class="card" style="max-width:400px;margin:0 auto;">
+    <h2 style="margin-bottom:16px;text-align:center">Crear cuenta</h2>
+    <label>Usuario</label><input id="reg-user">
+    <label>Correo</label><input id="reg-email" type="email">
+    <label>Contraseña</label><input id="reg-pass" type="password">
+    <label>Rol</label><select id="reg-role"><option value="customer">Cliente</option><option value="tattooist">Tatuador</option></select>
+    <button class="btn" onclick="register()">Registrarme</button>
+    <p style="text-align:center;margin-top:12px;font-size:12px">¿Ya tienes cuenta? <a href="/views/login.html" style="color:#ffb300">Inicia sesión</a></p>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+</body>
+</html>

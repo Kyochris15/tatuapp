@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Probador 3D - TatuApp</title>
+<style>
+  body{margin:0;font-family:system-ui,sans-serif;display:flex;height:100vh}
+  #panel{width:340px;padding:16px;background:#1e1e24;color:#eee;overflow:auto}
+  #viewport{flex:1}
+  label{display:block;margin-top:12px;font-size:13px}
+  input[type=range]{width:100%}
+  button{margin-top:8px;width:100%;padding:8px;cursor:pointer}
+  .card{background:#2a2a33;padding:10px;border-radius:8px;margin-top:10px;font-size:13px}
+  #guardar{background:#0f0;color:#000;font-weight:bold}
+  #cerrar{background:#d33;color:#fff}
+</style>
+</head>
+<body>
+<div id="panel">
+  <h2>Probador de tatuaje</h2>
+  <button id="cerrar" style="width:auto;float:right;margin:0 0 12px 8px">✕ Cerrar</button>
+  <label>Estatura: <span id="lblH">172</span> cm
+    <input id="altura" type="range" min="150" max="200" value="172"></label>
+  <label>Contextura: <span id="lblB">Media</span>
+    <input id="contextura" type="range" min="80" max="130" value="100"></label>
+  <label>Imagen del diseño: <input id="file" type="file" accept="image/*"></label>
+
+  <div class="card">
+    <b>Medidas del diseño</b>
+    <div id="medidas">Sube una imagen y haz clic sobre el cuerpo.</div>
+    <label>Ancho (cm) <input id="ancho" type="range" min="2" max="40" value="12" step="0.5"></label>
+    <label>Alto (cm) <input id="alto" type="range" min="2" max="40" value="12" step="0.5"></label>
+    <label>Rotación <input id="rot" type="range" min="0" max="360" value="0"></label>
+    <label>Opacidad <input id="opac" type="range" min="30" max="100" value="90"></label>
+    <label><input id="lock" type="checkbox" checked> Mantener proporción</label>
+    <button id="flip">Invertir (espejo)</button>
+    <button id="quitar">Quitar diseño</button>
+    <button id="guardar">Guardar diseño y reservar</button>
+  </div>
+</div>
+<div id="viewport"></div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { DecalGeometry } from 'three/addons/geometries/DecalGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const viewport = document.getElementById('viewport');
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer:true });
+renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+viewport.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x14151a);
+const camera = new THREE.PerspectiveCamera(45, viewport.clientWidth/viewport.clientHeight, 1, 2000);
+camera.position.set(0, 150, 320);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 90, 0); controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x444455, 1.2));
+const dir = new THREE.DirectionalLight(0xffffff, 1.5); dir.position.set(150,250,200); scene.add(dir);
+scene.add(new THREE.GridHelper(400, 40, 0x333344, 0x222233));
+
+const skinMat = new THREE.MeshStandardMaterial({ color:0xc9b8a8, roughness:.75 });
+const proxy = new THREE.Mesh(new THREE.BufferGeometry(), skinMat);
+scene.add(proxy);
+
+function addPart(g, geo, x,y,z, sx=1,sy=1,sz=1){
+  const m = new THREE.Mesh(geo, skinMat);
+  m.position.set(x,y,z); m.scale.set(sx,sy,sz); m.updateMatrix();
+  g.add(m); return m;
+}
+function buildBody(H, B){
+  const g = new THREE.Group();
+  const headR = H*.069;
+  addPart(g, new THREE.SphereGeometry(headR,32,24), 0, H-headR, 0);
+  addPart(g, new THREE.CylinderGeometry(headR*.5,headR*.6,H*.05,16), 0, H-headR*2.2, 0);
+  const torsoH = H*.30;
+  addPart(g, new THREE.CylinderGeometry(H*.115*B, H*.10*B, torsoH, 24), 0, H*.52+torsoH/2, 0, 1,1,.65);
+  addPart(g, new THREE.SphereGeometry(H*.105*B,24,16), 0, H*.50, 0, 1,.62,.7);
+  const armR = H*.030*Math.min(B*1.05,1.25), armTop = H*.80, armLen = H*.43, shX = H*.135*B+armR;
+  const legR = H*.055*B, legTop = H*.50, legBot = H*.045, legX = H*.06*B;
+  for (const s of [-1,1]){
+    addPart(g, new THREE.CapsuleGeometry(armR, armLen-2*armR, 8,16), s*shX, armTop-armLen/2, 0);
+    addPart(g, new THREE.SphereGeometry(armR*1.15,16,12), s*shX, armTop-armLen-armR, 0);
+    addPart(g, new THREE.CapsuleGeometry(legR, legTop-legBot-2*legR, 8,16), s*legX, (legTop+legBot)/2, 0);
+    addPart(g, new THREE.SphereGeometry(legR*1.1,16,12), s*legX, H*.035, H*.03, 1,.7,1.8);
+  }
+  const geos = g.children.map(p => p.geometry.clone().applyMatrix4(p.matrix));
+  proxy.geometry.dispose();
+  proxy.geometry = mergeGeometries(geos);
+}
+buildBody(172, 1.0);
+
+const raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2(), helper = new THREE.Object3D();
+const tattoo = { texture:null, mesh:null, pos:new THREE.Vector3(), normal:new THREE.Vector3(),
+                 roll:0, w:12, h:12, aspect:1, opacity:.9, placed:false };
+
+function pickBody(ev){
+  const r = viewport.getBoundingClientRect();
+  pointer.set(((ev.clientX-r.left)/r.width)*2-1, -((ev.clientY-r.top)/r.height)*2+1);
+  raycaster.setFromCamera(pointer, camera);
+  return raycaster.intersectObject(proxy)[0];
+}
+let dragging = false;
+renderer.domElement.addEventListener('pointerdown', ev => {
+  if (!tattoo.texture) return;
+  const hit = pickBody(ev);
+  if (hit){ placeAt(hit); dragging = true; controls.enabled = false; }
+});
+renderer.domElement.addEventListener('pointermove', ev => {
+  if (!dragging) return;
+  const hit = pickBody(ev);
+  if (hit) placeAt(hit);
+});
+addEventListener('pointerup', () => { dragging = false; controls.enabled = true; });
+
+function placeAt(hit){
+  tattoo.pos.copy(hit.point);
+  tattoo.normal.copy(hit.face.normal).transformDirection(proxy.matrixWorld);
+  tattoo.placed = true;
+  updateDecal();
+}
+function updateDecal(){
+  if (tattoo.mesh){ scene.remove(tattoo.mesh); tattoo.mesh.geometry.dispose(); tattoo.mesh = null; }
+  if (!tattoo.placed || !tattoo.texture) return;
+  helper.position.copy(tattoo.pos);
+  helper.lookAt(tattoo.pos.clone().sub(tattoo.normal));
+  helper.rotateZ(tattoo.roll);
+  const geo = new DecalGeometry(proxy, tattoo.pos, helper.rotation,
+                new THREE.Vector3(tattoo.w, tattoo.h, Math.max(tattoo.w, tattoo.h)));
+  const mat = new THREE.MeshStandardMaterial({ map: tattoo.texture, transparent:true,
+      opacity: tattoo.opacity, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-4, roughness:.8 });
+  tattoo.mesh = new THREE.Mesh(geo, mat); tattoo.mesh.renderOrder = 1;
+  scene.add(tattoo.mesh);
+}
+
+const $ = id => document.getElementById(id);
+$('file').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  new THREE.TextureLoader().load(URL.createObjectURL(f), tex => {
+    tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.RepeatWrapping;
+    tattoo.texture = tex;
+    tattoo.aspect = tex.image.height / tex.image.width;
+    tattoo.h = tattoo.w * tattoo.aspect;
+    $('alto').value = tattoo.h.toFixed(1);
+    updateMedidas();
+  });
+});
+$('altura').oninput = () => { $('lblH').textContent = $('altura').value; buildBody(+$('altura').value, +$('contextura').value/100); };
+$('contextura').oninput = () => {
+  const b = +$('contextura').value;
+  $('lblB').textContent = b < 90 ? 'Delgada' : b <= 110 ? 'Media' : 'Robusta';
+  buildBody(+$('altura').value, b/100);
+};
+$('ancho').oninput = () => {
+  tattoo.w = +$('ancho').value;
+  if ($('lock').checked){ tattoo.h = tattoo.w * tattoo.aspect; $('alto').value = tattoo.h.toFixed(1); }
+  updateDecal(); updateMedidas();
+};
+$('alto').oninput = () => {
+  tattoo.h = +$('alto').value;
+  if ($('lock').checked){ tattoo.w = tattoo.h / tattoo.aspect; $('ancho').value = tattoo.w.toFixed(1); }
+  updateDecal(); updateMedidas();
+};
+$('rot').oninput  = () => { tattoo.roll = $('rot').value * Math.PI/180; updateDecal(); };
+$('opac').oninput = () => { tattoo.opacity = $('opac').value/100; if (tattoo.mesh) tattoo.mesh.material.opacity = tattoo.opacity; };
+$('flip').onclick = () => { if (tattoo.texture) tattoo.texture.repeat.x = tattoo.texture.repeat.x === 1 ? -1 : 1; };
+$('quitar').onclick = () => { if (tattoo.mesh){ scene.remove(tattoo.mesh); tattoo.mesh=null; } tattoo.placed = false; };
+
+function updateMedidas(){
+  const area = tattoo.w * tattoo.h;
+  $('medidas').innerHTML = `Ancho: <b>${tattoo.w.toFixed(1)} cm</b> × Alto: <b>${tattoo.h.toFixed(1)} cm</b><br>Superficie: ${area.toFixed(0)} cm²`;
+}
+
+function getDesignData(){
+  return {
+    width: tattoo.w,
+    height: tattoo.h,
+    rotation: tattoo.roll,
+    opacity: tattoo.opacity,
+    position: tattoo.pos ? { x: tattoo.pos.x, y: tattoo.pos.y, z: tattoo.pos.z } : null,
+    normal: tattoo.normal ? { x: tattoo.normal.x, y: tattoo.normal.y, z: tattoo.normal.z } : null,
+    hasTexture: !!tattoo.texture
+  };
+}
+
+$('guardar').onclick = () => {
+  if (!tattoo.placed || !tattoo.texture) return alert('Coloca primero el diseño sobre el cuerpo.');
+  const design = getDesignData();
+  renderer.render(scene, camera);
+  const dataURL = renderer.domElement.toDataURL('image/png');
+  design.preview = dataURL;
+  if (window.opener && window.opener.sendDesignToReservation) {
+    window.opener.sendDesignToReservation(design);
+    window.close();
+  } else {
+    localStorage.setItem('pendingDesign', JSON.stringify(design));
+    alert('Diseño guardado. Vuelve a la página de cliente para completar tu reserva.');
+  }
+};
+
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+addEventListener('resize', () => {
+  camera.aspect = viewport.clientWidth/viewport.clientHeight; camera.updateProjectionMatrix();
+  renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+});
+</script>
+</body>
+</html>

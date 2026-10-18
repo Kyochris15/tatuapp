@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Mi Perfil - TatuApp</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header>
+  <h1>🖋️ TatuApp - Mi Perfil</h1>
+  <div class="user" id="user-display"></div>
+  <button class="btn outline" onclick="logout()">Cerrar sesión</button>
+</header>
+<main style="grid-template-columns:1fr; height:auto; padding:40px 20px;">
+  <div class="card profile-card">
+    <h2 style="margin-bottom:20px;color:#fff">Editar perfil</h2>
+    <label>Usuario</label><input id="p-username" type="text">
+    <label>Correo electrónico</label><input id="p-email" type="email">
+    <label>Nueva contraseña (dejar vacía para no cambiar)</label><input id="p-password" type="password">
+    <span class="password-toggle">Rol actual: <b id="p-role"></b></span>
+    <div class="profile-actions">
+      <button class="btn" onclick="saveProfile()">Guardar cambios</button>
+      <button class="btn secondary" onclick="location.href='/views/client.html'">Volver</button>
+    </div>
+  </div>
+</main>
+<script src="/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const u = await (await fetch('/api/me')).json();
+  if (!u) { location.href = '/views/login.html'; return; }
+  document.getElementById('user-display').textContent = u.username + ' (' + u.role + ')';
+  loadProfile();
+});
+</script>
+</body>
+</html>
